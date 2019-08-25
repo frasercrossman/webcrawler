@@ -1,26 +1,27 @@
 package com.frasercrossman.webcrawler;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
+import java.util.Set;
 
 public class Main {
 
   public static void main(String[] args) {
-    WebClient wc = new WebClient();
+    Crawler c = new Crawler();
 
     try {
-      HtmlPage page = wc.getPage("https://www.frasercrossman.com");
-      System.out.println(page.getTitleText());
+      URL url = new URL(args[1]);
+      Map<URL, Set<URL>> sitemap = c.crawlSite(url);
 
-      System.out.println("Anchor tags:");
-      page.getBody().getHtmlElementsByTagName("a").forEach(htmlElement -> {
-        String href = htmlElement.getAttribute("href");
-        System.out.println(href);
+      sitemap.keySet().forEach(key -> {
+        System.out.printf("%s\n", key);
+        sitemap.get(key).forEach(page -> {
+          System.out.printf("\t%s\n", page);
+        });
       });
-
-    } catch (IOException e1) {
-      e1.printStackTrace();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
     }
   }
 }
