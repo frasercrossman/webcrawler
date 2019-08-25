@@ -39,6 +39,7 @@ public class WebPageScraper {
 
         for (int i = 0; i < anchorElements.size(); i++) {
           href = anchorElements.get(i).getAttribute("href");
+          href = stripAnchorFromURL(href);
 
           // If link is local prepend root url protocol and hostname
           if (href.startsWith("/")) {
@@ -61,5 +62,15 @@ public class WebPageScraper {
     }
 
     return internalLinks;
+  }
+
+  public String stripAnchorFromURL(String url) {
+    int anchorLocation = url.indexOf("#");
+
+    if (anchorLocation != -1) {
+      url = url.substring(0, anchorLocation);
+    }
+
+    return url;
   }
 }
