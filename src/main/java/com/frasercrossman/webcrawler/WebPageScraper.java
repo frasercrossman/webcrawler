@@ -16,6 +16,9 @@ public class WebPageScraper {
 
   WebPageScraper() {
     wc = new WebClient();
+    wc.setCssEnabled(false);
+    wc.setAppletEnabled(false);
+    wc.setJavaScriptEnabled(false);
   }
 
   public Set<URL> getInternalLinks(URL url) {
