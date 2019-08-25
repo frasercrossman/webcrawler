@@ -1,5 +1,7 @@
 package com.frasercrossman.webcrawler;
 
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -25,30 +27,36 @@ public class WebPageScraper {
     Set<URL> internalLinks = new HashSet<>();
 
     try {
-      HtmlPage page = wc.getPage(url);
-      List<HtmlElement> anchorElements = page.getBody().getHtmlElementsByTagName("a");
-      String href;
-      URL newPageURL;
+      Page page = wc.getPage(url);
 
-      for (int i = 0; i < anchorElements.size(); i++) {
-        href = anchorElements.get(i).getAttribute("href");
+      // Only proceed if the page is an HTML page
+      if (page instanceof HtmlPage) {
+        HtmlPage htmlPage = (HtmlPage) page;
 
-        // If link is local prepend root url protocol and hostname
-        if (href.startsWith("/")) {
-          href = url.getProtocol() + "://" + url.getHost() + href;
-        }
+        List<HtmlElement> anchorElements = htmlPage.getBody().getHtmlElementsByTagName("a");
+        String href;
+        URL newPageURL;
 
-        try {
-          newPageURL = new URL(href);
+        for (int i = 0; i < anchorElements.size(); i++) {
+          href = anchorElements.get(i).getAttribute("href");
 
-          // Only add site if hosts match
-          if (url.getHost().equalsIgnoreCase(newPageURL.getHost())) {
-            internalLinks.add(newPageURL);
+          // If link is local prepend root url protocol and hostname
+          if (href.startsWith("/")) {
+            href = url.getProtocol() + "://" + url.getHost() + href;
           }
-        } catch (MalformedURLException e) {
+
+          try {
+            newPageURL = new URL(href);
+
+            // Only add site if hosts match
+            if (url.getHost().equalsIgnoreCase(newPageURL.getHost())) {
+              internalLinks.add(newPageURL);
+            }
+          } catch (MalformedURLException e) {
+          }
         }
       }
-    } catch (IOException e) {
+    } catch (IOException | FailingHttpStatusCodeException e) {
       e.printStackTrace();
     }
 
