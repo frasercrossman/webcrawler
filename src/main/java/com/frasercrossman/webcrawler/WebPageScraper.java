@@ -19,7 +19,11 @@ public class WebPageScraper {
   private WebClient wc;
 
   WebPageScraper() {
-    wc = new WebClient();
+    this(new WebClient());
+  }
+
+  WebPageScraper(WebClient wc) {
+    this.wc = wc;
     wc.setCssEnabled(false);
     wc.setAppletEnabled(false);
     wc.setJavaScriptEnabled(false);
