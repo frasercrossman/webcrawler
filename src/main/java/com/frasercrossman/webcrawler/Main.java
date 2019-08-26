@@ -11,7 +11,7 @@ public class Main {
     Crawler c = new Crawler();
 
     try {
-      URL url = new URL(args[1]);
+      URL url = new URL(args[0]);
       Map<URL, Set<URL>> sitemap = c.crawlSite(url);
 
       sitemap.keySet().forEach(key -> {

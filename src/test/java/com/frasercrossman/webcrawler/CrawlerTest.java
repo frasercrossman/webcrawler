@@ -1,63 +1,100 @@
 package com.frasercrossman.webcrawler;
 
+import static com.gargoylesoftware.htmlunit.util.UrlUtils.getUrlWithNewPath;
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import com.gargoylesoftware.htmlunit.MockWebConnection;
+import com.gargoylesoftware.htmlunit.WebClient;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
 import org.hamcrest.Matchers;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class CrawlerTest {
 
-  @Test
-  public void testSitemapContainsURL() throws MalformedURLException {
-    Crawler c = new Crawler();
-    URL url = new URL("https://frasercrossman.com/");
-    Map<URL, Set<URL>> sitemap = c.crawlSite(url);
+  private static MockWebConnection webConnection;
+  private static WebClient webClient;
+  private static URL foo;
 
-    assertThat(sitemap.keySet(), hasItem(url));
+  @BeforeClass
+  public static void setupClass() throws MalformedURLException {
+    webConnection = new MockWebConnection();
+    webClient = new WebClient();
+    webClient.setWebConnection(webConnection);
+
+    foo = new URL("http://foo.com/");
+    URL bar = new URL("http://bar.com/");
+
+    final String fooIndexHtmlContent
+        = "<html><head><title>foo</title></head><body>\n"
+        + "<a href='" + foo.toString() + "index.html'>Index</a>\n"
+        + "<a href='" + foo.toString() + "about.html'>About</a>\n"
+        + "<a href='" + bar.toString() + "index.html'>Bar Site</a>\n"
+        + "</body></html>";
+
+    final String fooAboutHtmlContent
+        = "<html><head><title>foo</title></head><body>\n"
+        + "<a href='" + foo.toString() + "index.html'>Index</a>\n"
+        + "<a href='" + foo.toString() + "about.html'>About</a>\n"
+        + "<a href='" + foo.toString() + "404.html'>404</a>\n"
+        + "<a href='" + bar.toString() + "index.html'>Bar Site Index</a>\n"
+        + "<a href='" + bar.toString() + "about.html'>Bar Site About</a>\n"
+        + "</body></html>";
+
+    webConnection.setDefaultResponse("404 page not found");
+    webConnection.setResponse(foo, fooIndexHtmlContent);
+    webConnection.setResponse(getUrlWithNewPath(foo, "/index.html"), fooIndexHtmlContent);
+    webConnection.setResponse(getUrlWithNewPath(foo, "/about.html"), fooAboutHtmlContent);
   }
 
   @Test
-  public void testSitemapKeyContainNoForeignURLs() throws MalformedURLException {
-    Crawler c = new Crawler();
-    URL url = new URL("https://frasercrossman.com/");
-    Map<URL, Set<URL>> sitemap = c.crawlSite(url);
+  public void testSitemapContainsURL() {
+    Crawler c = new Crawler(webClient);
+
+    Map<URL, Set<URL>> sitemap = c.crawlSite(foo);
+
+    assertThat(sitemap.keySet(), hasItem(foo));
+  }
+
+  @Test
+  public void testSitemapKeyContainNoForeignURLs() {
+    Crawler c = new Crawler(webClient);
+
+    Map<URL, Set<URL>> sitemap = c.crawlSite(foo);
 
     assertThat(sitemap.keySet(),
-        everyItem(Matchers.hasProperty("host", equalTo(url.getHost()))));
+        everyItem(Matchers.hasProperty("host", equalTo(foo.getHost()))));
   }
 
   @Test
   public void testSitemapValuesContainNoForeignURLs() throws MalformedURLException {
-    Crawler c = new Crawler();
-    URL url = new URL("https://frasercrossman.com/");
-    Map<URL, Set<URL>> sitemap = c.crawlSite(url);
+    Crawler c = new Crawler(webClient);
+
+    Map<URL, Set<URL>> sitemap = c.crawlSite(foo);
 
     sitemap.keySet().forEach(key -> {
       assertThat(sitemap.get(key),
-          everyItem(Matchers.hasProperty("host", equalTo(url.getHost()))));
+          everyItem(Matchers.hasProperty("host", equalTo(foo.getHost()))));
     });
   }
 
   @Test
-  public void testAllDiscoveredPagesAreExplored() throws MalformedURLException {
-    Crawler c = new Crawler();
-    URL url = new URL("https://frasercrossman.com/");
-    Map<URL, Set<URL>> sitemap = c.crawlSite(url);
+  public void testAllDiscoveredPagesAreExplored() {
+    Crawler c = new Crawler(webClient);
+
+    Map<URL, Set<URL>> sitemap = c.crawlSite(foo);
 
     Set<URL> discoveredPages = new HashSet<>();
-
-    sitemap.keySet().forEach(key -> {
-      discoveredPages.addAll(sitemap.get(key));
-    });
+    discoveredPages.add(foo);
+    sitemap.keySet().forEach(key -> discoveredPages.addAll(sitemap.get(key)));
 
     assertEquals(discoveredPages, sitemap.keySet());
   }
