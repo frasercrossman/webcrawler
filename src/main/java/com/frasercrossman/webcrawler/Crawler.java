@@ -1,5 +1,6 @@
 package com.frasercrossman.webcrawler;
 
+import com.gargoylesoftware.htmlunit.WebClient;
 import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -11,14 +12,24 @@ class Crawler {
 
   private Map<URL, Set<URL>> sitemap;
   private Queue<URL> pageQueue;
+  private WebPageScraper webPageScraper;
 
   Crawler() {
+    this(new WebPageScraper());
+  }
+
+  Crawler(WebClient webClient) {
+    this(new WebPageScraper(webClient));
+  }
+
+
+  private Crawler(WebPageScraper webPageScraper) {
     sitemap = new HashMap<>();
     pageQueue = new ArrayDeque<>();
+    this.webPageScraper = webPageScraper;
   }
 
   Map<URL, Set<URL>> crawlSite(URL rootUrl) {
-    WebPageScraper ws = new WebPageScraper();
     Set<URL> internalLinksDiscovered;
     URL currentPageURL;
 
@@ -28,7 +39,7 @@ class Crawler {
     while (!pageQueue.isEmpty()) {
       currentPageURL = pageQueue.remove();
 
-      internalLinksDiscovered = ws.getInternalLinks(currentPageURL);
+      internalLinksDiscovered = webPageScraper.getInternalLinks(currentPageURL);
       sitemap.put(currentPageURL, internalLinksDiscovered);
 
       internalLinksDiscovered.forEach(newPageURL -> {
