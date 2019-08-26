@@ -1,5 +1,7 @@
 package com.frasercrossman.webcrawler;
 
+import static com.gargoylesoftware.htmlunit.util.UrlUtils.resolveUrl;
+
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -39,17 +41,14 @@ public class WebPageScraper {
 
         for (int i = 0; i < anchorElements.size(); i++) {
           href = anchorElements.get(i).getAttribute("href");
-          href = stripAnchorFromURL(href);
 
-          // If link is local prepend root url protocol and hostname
-          if (href.startsWith("/")) {
-            href = url.getProtocol() + "://" + url.getHost() + href;
-          }
+          // If URL is relative resolve url, otherwise leave unchanged
+          href = resolveUrl(url, href);
 
           try {
-            newPageURL = new URL(href);
+            newPageURL = getURLWithoutParameters(new URL(href));
 
-            // Only add site if hosts match
+            // Only add page url if hosts match
             if (url.getHost().equalsIgnoreCase(newPageURL.getHost())) {
               internalLinks.add(newPageURL);
             }
@@ -64,13 +63,7 @@ public class WebPageScraper {
     return internalLinks;
   }
 
-  public String stripAnchorFromURL(String url) {
-    int anchorLocation = url.indexOf("#");
-
-    if (anchorLocation != -1) {
-      url = url.substring(0, anchorLocation);
-    }
-
-    return url;
+  private URL getURLWithoutParameters(URL url) throws MalformedURLException {
+    return new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getPath());
   }
 }
