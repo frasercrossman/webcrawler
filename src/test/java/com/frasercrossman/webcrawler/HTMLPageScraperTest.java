@@ -82,4 +82,22 @@ public class HTMLPageScraperTest {
     assertThat(internalLinks,
         everyItem(Matchers.hasProperty("host", not(containsString("&")))));
   }
+
+  @Test
+  public void testPageWithBrokenLink() {
+    final String htmlContent
+        = "<html><head><title>foo</title></head><body>\n"
+        + "<a href='" + foo.toString() + "index.html---3\\//\\'>Index</a>\n"
+        + "<a href='" + foo.toString() + "abo*&%&^ut.html#Introduction'>About Introduction</a>\n"
+        + "<a href='ksj:://kkyyabout.html#Education'>About Education</a>\n"
+        + "</body></html>";
+
+    webConnection.setResponse(foo, htmlContent);
+
+    HTMLPageScraper htmlPageScraper = new HTMLPageScraper(webClient);
+    Set<URL> internalLinks = htmlPageScraper.getInternalLinks(foo);
+
+    // Assert that the correct number of links are returned and that the hostname matches
+    assertEquals(2, internalLinks.size());
+  }
 }
