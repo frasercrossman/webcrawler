@@ -1,5 +1,6 @@
-package com.frasercrossman.webcrawler;
+package com.frasercrossman.webcrawler.engine;
 
+import com.frasercrossman.webcrawler.web.WebPageScraper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import java.net.URL;
 import java.util.ArrayDeque;
@@ -8,7 +9,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-class SingleThreadedCrawler extends Crawler {
+public class SingleThreadedCrawler extends Crawler {
 
   private Queue<URL> pageQueue;
 

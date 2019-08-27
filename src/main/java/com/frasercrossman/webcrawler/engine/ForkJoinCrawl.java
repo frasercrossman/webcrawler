@@ -1,4 +1,4 @@
-package com.frasercrossman.webcrawler;
+package com.frasercrossman.webcrawler.engine;
 
 import java.net.URL;
 import java.util.ArrayList;

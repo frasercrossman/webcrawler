@@ -1,5 +1,6 @@
-package com.frasercrossman.webcrawler;
+package com.frasercrossman.webcrawler.engine;
 
+import com.frasercrossman.webcrawler.web.WebPageScraper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import java.net.URL;
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 
-class MultiThreadedCrawler extends Crawler {
+public class MultiThreadedCrawler extends Crawler {
 
   private static final int DEFAULT_THREAD_COUNT = 4;
 
