@@ -1,6 +1,6 @@
 package com.frasercrossman.webcrawler.engine;
 
-import com.frasercrossman.webcrawler.web.WebPageScraper;
+import com.frasercrossman.webcrawler.web.HTMLPageScraper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import java.net.URL;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class MultiThreadedCrawler extends Crawler {
   }
 
   public MultiThreadedCrawler(int threadCount, WebClient webClient) {
-    super(new ConcurrentHashMap<>(), new WebPageScraper(webClient));
+    super(new ConcurrentHashMap<>(), new HTMLPageScraper(webClient));
 
     forkJoinPool = new ForkJoinPool(threadCount);
   }

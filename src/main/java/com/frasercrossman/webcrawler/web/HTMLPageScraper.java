@@ -12,15 +12,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class WebPageScraper {
+public class HTMLPageScraper {
 
   private WebClient webClient;
 
-  public WebPageScraper() {
+  public HTMLPageScraper() {
     this(new WebClient());
   }
 
-  public WebPageScraper(WebClient webClient) {
+  public HTMLPageScraper(WebClient webClient) {
     this.webClient = webClient;
     webClient.setCssEnabled(false);
     webClient.setAppletEnabled(false);

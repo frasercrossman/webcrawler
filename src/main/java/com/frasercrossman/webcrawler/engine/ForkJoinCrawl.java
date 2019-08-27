@@ -19,7 +19,7 @@ class ForkJoinCrawl extends RecursiveAction {
 
   @Override
   protected void compute() {
-    Set<URL> internalLinksDiscovered = crawler.getWebPageScraper().getInternalLinks(url);
+    Set<URL> internalLinksDiscovered = crawler.getHtmlPageScraper().getInternalLinks(url);
     List<RecursiveAction> actions = new ArrayList<>();
 
     crawler.getSitemap().put(url, internalLinksDiscovered);

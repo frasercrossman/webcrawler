@@ -7,7 +7,7 @@ import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.frasercrossman.webcrawler.web.WebPageScraper;
+import com.frasercrossman.webcrawler.web.HTMLPageScraper;
 import com.gargoylesoftware.htmlunit.MockWebConnection;
 import com.gargoylesoftware.htmlunit.WebClient;
 import java.net.MalformedURLException;
@@ -17,10 +17,17 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WebPageScraperTest {
+public class HTMLPageScraperTest {
 
   private MockWebConnection webConnection;
   private WebClient webClient;
+  private URL foo;
+  private URL bar;
+
+  public HTMLPageScraperTest() throws MalformedURLException {
+    foo = new URL("http://foo.com/");
+    bar = new URL("http://bar.com/");
+  }
 
   @Before
   public void setup() {
@@ -30,9 +37,7 @@ public class WebPageScraperTest {
   }
 
   @Test
-  public void testGetInternalLinks() throws MalformedURLException {
-    final URL foo = new URL("http://foo.com/");
-    final URL bar = new URL("http://bar.com/");
+  public void testGetInternalLinks() {
     final String htmlContent
         = "<html><head><title>foo</title></head><body>\n"
         + "<a href='" + foo.toString() + "/index.html'>Index</a>\n"
@@ -42,8 +47,8 @@ public class WebPageScraperTest {
 
     webConnection.setResponse(foo, htmlContent);
 
-    WebPageScraper webPageScraper = new WebPageScraper(webClient);
-    Set<URL> internalLinks = webPageScraper.getInternalLinks(foo);
+    HTMLPageScraper htmlPageScraper = new HTMLPageScraper(webClient);
+    Set<URL> internalLinks = htmlPageScraper.getInternalLinks(foo);
 
     // Assert that the correct number of links are returned and that the hostname matches
     assertEquals(2, internalLinks.size());
@@ -52,9 +57,7 @@ public class WebPageScraperTest {
   }
 
   @Test
-  public void testGetURLWithoutParameters() throws MalformedURLException {
-    final URL foo = new URL("http://foo.com/");
-    final URL bar = new URL("http://bar.com/");
+  public void testGetURLWithoutParameters() {
     final String htmlContent
         = "<html><head><title>foo</title></head><body>\n"
         + "<a href='" + foo.toString() + "index.html'>Index</a>\n"
@@ -68,8 +71,8 @@ public class WebPageScraperTest {
 
     webConnection.setResponse(foo, htmlContent);
 
-    WebPageScraper webPageScraper = new WebPageScraper(webClient);
-    Set<URL> internalLinks = webPageScraper.getInternalLinks(foo);
+    HTMLPageScraper htmlPageScraper = new HTMLPageScraper(webClient);
+    Set<URL> internalLinks = htmlPageScraper.getInternalLinks(foo);
 
     // Assert that no urls contain references or query parameters
     assertThat(internalLinks,

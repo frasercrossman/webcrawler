@@ -1,6 +1,6 @@
 package com.frasercrossman.webcrawler.engine;
 
-import com.frasercrossman.webcrawler.web.WebPageScraper;
+import com.frasercrossman.webcrawler.web.HTMLPageScraper;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
@@ -8,19 +8,19 @@ import java.util.Set;
 public abstract class Crawler {
 
   private Map<URL, Set<URL>> sitemap;
-  private WebPageScraper webPageScraper;
+  private HTMLPageScraper htmlPageScraper;
 
-  Crawler(Map<URL, Set<URL>> sitemap, WebPageScraper webPageScraper) {
+  Crawler(Map<URL, Set<URL>> sitemap, HTMLPageScraper htmlPageScraper) {
     this.sitemap = sitemap;
-    this.webPageScraper = webPageScraper;
+    this.htmlPageScraper = htmlPageScraper;
   }
 
   Map<URL, Set<URL>> getSitemap() {
     return sitemap;
   }
 
-  WebPageScraper getWebPageScraper() {
-    return webPageScraper;
+  HTMLPageScraper getHtmlPageScraper() {
+    return htmlPageScraper;
   }
 
   public abstract Map<URL, Set<URL>> crawlSite(URL url);
