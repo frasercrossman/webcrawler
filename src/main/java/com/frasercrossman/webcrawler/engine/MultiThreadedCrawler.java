@@ -29,7 +29,9 @@ public class MultiThreadedCrawler extends Crawler {
   public MultiThreadedCrawler(int threadCount, WebClient webClient) {
     super(new ConcurrentHashMap<>(), new HTMLPageScraper(webClient));
 
-    forkJoinPool = new ForkJoinPool(threadCount);
+    // Thread count must be between 1 and the number of available processors
+    int availableProcessors = Runtime.getRuntime().availableProcessors();
+    forkJoinPool = new ForkJoinPool(Math.min(availableProcessors, Math.max(1, threadCount)));
   }
 
   public Map<URL, Set<URL>> crawlSite(URL rootUrl) {

@@ -20,11 +20,9 @@ public class Main {
       String inputUrl = args[1];
 
       if (threadCount > 1) {
-        // Limit thread count to available processors
+        // Thread count must be between 1 and the number of available processors
         int availableProcessors = Runtime.getRuntime().availableProcessors();
-        if (threadCount > availableProcessors) {
-          threadCount = availableProcessors;
-        }
+        threadCount = Math.min(availableProcessors, Math.max(1, threadCount));
 
         System.out.printf("MultiThreadedCrawler [%d threads]:\n", threadCount);
         crawler = new MultiThreadedCrawler(threadCount);

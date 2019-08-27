@@ -39,7 +39,14 @@ public class CrawlerTest {
     WebClient webClient = new WebClient();
     webClient.setWebConnection(webConnection);
 
-    return Arrays.asList(new SingleThreadedCrawler(webClient), new MultiThreadedCrawler(webClient));
+    return Arrays.asList(new SingleThreadedCrawler(webClient),
+        new MultiThreadedCrawler(webClient),
+        new MultiThreadedCrawler(-1, webClient),
+        new MultiThreadedCrawler(0, webClient),
+        new MultiThreadedCrawler(1, webClient),
+        new MultiThreadedCrawler(2, webClient),
+        new MultiThreadedCrawler(Integer.MAX_VALUE, webClient),
+        new MultiThreadedCrawler(Integer.MIN_VALUE, webClient));
   }
 
   public CrawlerTest(Crawler crawler) throws MalformedURLException {
