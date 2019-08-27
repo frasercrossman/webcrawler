@@ -1,5 +1,8 @@
 package com.frasercrossman.webcrawler;
 
+import com.frasercrossman.webcrawler.engine.Crawler;
+import com.frasercrossman.webcrawler.engine.MultiThreadedCrawler;
+import com.frasercrossman.webcrawler.engine.SingleThreadedCrawler;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -10,16 +13,16 @@ public class Main {
   public static void main(String[] args) {
     Crawler crawler;
 
-    if(args.length != 2) {
+    if (args.length != 2) {
       System.out.println("Expected 2 args: [thread count] [url]");
     } else {
       int threadCount = Integer.valueOf(args[0]);
       String inputUrl = args[1];
 
-      if(threadCount > 1) {
-        // Limit thread count to available processors
+      if (threadCount > 1) {
+        // Thread count must be between 1 and the number of available processors
         int availableProcessors = Runtime.getRuntime().availableProcessors();
-        if(threadCount > availableProcessors) threadCount = availableProcessors;
+        threadCount = Math.min(availableProcessors, Math.max(1, threadCount));
 
         System.out.printf("MultiThreadedCrawler [%d threads]:\n", threadCount);
         crawler = new MultiThreadedCrawler(threadCount);

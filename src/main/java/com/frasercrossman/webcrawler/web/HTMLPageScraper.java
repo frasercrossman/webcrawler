@@ -1,4 +1,4 @@
-package com.frasercrossman.webcrawler;
+package com.frasercrossman.webcrawler.web;
 
 import static com.gargoylesoftware.htmlunit.util.UrlUtils.resolveUrl;
 
@@ -12,15 +12,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class WebPageScraper {
+public class HTMLPageScraper {
 
   private WebClient webClient;
 
-  WebPageScraper() {
+  public HTMLPageScraper() {
     this(new WebClient());
   }
 
-  WebPageScraper(WebClient webClient) {
+  public HTMLPageScraper(WebClient webClient) {
     this.webClient = webClient;
     webClient.setCssEnabled(false);
     webClient.setAppletEnabled(false);

@@ -1,5 +1,6 @@
-package com.frasercrossman.webcrawler;
+package com.frasercrossman.webcrawler.engine;
 
+import com.frasercrossman.webcrawler.web.HTMLPageScraper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import java.net.URL;
 import java.util.ArrayDeque;
@@ -8,7 +9,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-class SingleThreadedCrawler extends Crawler {
+public class SingleThreadedCrawler extends Crawler {
 
   private Queue<URL> pageQueue;
 
@@ -17,7 +18,7 @@ class SingleThreadedCrawler extends Crawler {
   }
 
   public SingleThreadedCrawler(WebClient webClient) {
-    super(new HashMap<>(), new WebPageScraper(webClient));
+    super(new HashMap<>(), new HTMLPageScraper(webClient));
 
     this.pageQueue = new ArrayDeque<>();
   }
@@ -31,7 +32,7 @@ class SingleThreadedCrawler extends Crawler {
     while (!pageQueue.isEmpty()) {
       url = pageQueue.remove();
 
-      internalLinksDiscovered = this.getWebPageScraper().getInternalLinks(url);
+      internalLinksDiscovered = this.getHtmlPageScraper().getInternalLinks(url);
       this.getSitemap().put(url, internalLinksDiscovered);
 
       internalLinksDiscovered.forEach(discoveredUrl -> {
