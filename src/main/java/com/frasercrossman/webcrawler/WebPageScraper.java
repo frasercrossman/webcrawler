@@ -2,12 +2,10 @@ package com.frasercrossman.webcrawler;
 
 import static com.gargoylesoftware.htmlunit.util.UrlUtils.resolveUrl;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
@@ -16,24 +14,24 @@ import java.util.Set;
 
 public class WebPageScraper {
 
-  private WebClient wc;
+  private WebClient webClient;
 
   WebPageScraper() {
     this(new WebClient());
   }
 
-  WebPageScraper(WebClient wc) {
-    this.wc = wc;
-    wc.setCssEnabled(false);
-    wc.setAppletEnabled(false);
-    wc.setJavaScriptEnabled(false);
+  WebPageScraper(WebClient webClient) {
+    this.webClient = webClient;
+    webClient.setCssEnabled(false);
+    webClient.setAppletEnabled(false);
+    webClient.setJavaScriptEnabled(false);
   }
 
   public Set<URL> getInternalLinks(URL url) {
     Set<URL> internalLinks = new HashSet<>();
 
     try {
-      Page page = wc.getPage(url);
+      Page page = webClient.getPage(url);
 
       // Only proceed if the page is an HTML page
       if (page instanceof HtmlPage) {
@@ -43,8 +41,8 @@ public class WebPageScraper {
         String href;
         URL newPageURL;
 
-        for (int i = 0; i < anchorElements.size(); i++) {
-          href = anchorElements.get(i).getAttribute("href");
+        for (HtmlElement anchorElement : anchorElements) {
+          href = anchorElement.getAttribute("href");
 
           // If URL is relative resolve url, otherwise leave unchanged
           href = resolveUrl(url, href);
@@ -57,11 +55,14 @@ public class WebPageScraper {
               internalLinks.add(newPageURL);
             }
           } catch (MalformedURLException e) {
+            // The URL specified in the href attribute was malformed
+            // It can be safely ignored as the link cannot be followed
           }
         }
       }
-    } catch (IOException | FailingHttpStatusCodeException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      // If something goes wrong while requesting or parsing the page an exception will be thrown
+      // It can be safely ignored, an empty set of internal links is returned
     }
 
     return internalLinks;

@@ -11,24 +11,36 @@ import com.gargoylesoftware.htmlunit.MockWebConnection;
 import com.gargoylesoftware.htmlunit.WebClient;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.hamcrest.Matchers;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class CrawlerTest {
 
   private static MockWebConnection webConnection;
-  private static WebClient webClient;
-  private static URL foo;
 
-  @BeforeClass
-  public static void setupClass() throws MalformedURLException {
+  private Crawler crawler;
+  private URL foo;
+
+  @Parameters
+  public static Collection<Crawler> crawlers() {
     webConnection = new MockWebConnection();
-    webClient = new WebClient();
+    WebClient webClient = new WebClient();
     webClient.setWebConnection(webConnection);
+
+    return Arrays.asList(new SingleThreadedCrawler(webClient), new MultiThreadedCrawler(webClient));
+  }
+
+  public CrawlerTest(Crawler crawler) throws MalformedURLException {
+    this.crawler = crawler;
 
     foo = new URL("http://foo.com/");
     URL bar = new URL("http://bar.com/");
@@ -57,18 +69,14 @@ public class CrawlerTest {
 
   @Test
   public void testSitemapContainsURL() {
-    Crawler c = new Crawler(webClient);
-
-    Map<URL, Set<URL>> sitemap = c.crawlSite(foo);
+    Map<URL, Set<URL>> sitemap = crawler.crawlSite(foo);
 
     assertThat(sitemap.keySet(), hasItem(foo));
   }
 
   @Test
   public void testSitemapKeyContainNoForeignURLs() {
-    Crawler c = new Crawler(webClient);
-
-    Map<URL, Set<URL>> sitemap = c.crawlSite(foo);
+    Map<URL, Set<URL>> sitemap = crawler.crawlSite(foo);
 
     assertThat(sitemap.keySet(),
         everyItem(Matchers.hasProperty("host", equalTo(foo.getHost()))));
@@ -76,9 +84,7 @@ public class CrawlerTest {
 
   @Test
   public void testSitemapValuesContainNoForeignURLs() throws MalformedURLException {
-    Crawler c = new Crawler(webClient);
-
-    Map<URL, Set<URL>> sitemap = c.crawlSite(foo);
+    Map<URL, Set<URL>> sitemap = crawler.crawlSite(foo);
 
     sitemap.keySet().forEach(key -> {
       assertThat(sitemap.get(key),
@@ -88,9 +94,7 @@ public class CrawlerTest {
 
   @Test
   public void testAllDiscoveredPagesAreExplored() {
-    Crawler c = new Crawler(webClient);
-
-    Map<URL, Set<URL>> sitemap = c.crawlSite(foo);
+    Map<URL, Set<URL>> sitemap = crawler.crawlSite(foo);
 
     Set<URL> discoveredPages = new HashSet<>();
     discoveredPages.add(foo);
