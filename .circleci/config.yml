@@ -2,7 +2,7 @@ version: 2
 jobs: # a collection of steps
   build:
     docker:
-      - image: cimg/openjdk:17.0.0
+      - image: cimg/openjdk:11.0.12
     environment:
       _JAVA_OPTIONS: "-Xmx3g"
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
