@@ -4,6 +4,8 @@ jobs: # a collection of steps
     environment:
       _JAVA_OPTIONS: "-Xmx3g"
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+      docker:
+      - image: cimg/base:2021.04
     steps: # a collection of executable commands
       - checkout
       - restore_cache:
