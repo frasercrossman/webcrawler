@@ -37,7 +37,9 @@ jobs:
 
       # run tests!
       - run: 
-      echo "Getting ready to run build"
-      ./gradlew test
+        name: run tests
+        command: |     
+                  echo "Getting ready to run build"
+                  ./gradlew test
 
 
