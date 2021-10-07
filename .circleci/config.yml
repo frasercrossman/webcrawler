@@ -27,9 +27,7 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
-      # run tests!
-      - run: ./gradlew build
-      
+
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -37,11 +35,9 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: gradle dependencies
-
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+      # run tests!
+      - run: 
+      echo "Getting ready to run build"
+      ./gradlew test
 
 
